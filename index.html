@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0B0A0F">
+<title>Bunk Meter · Term II</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230B0A0F'/%3E%3Ctext x='50' y='68' font-size='54' text-anchor='middle' font-family='Arial' font-weight='800' fill='%23FF2D78'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Archivo:wght@400;500;600;700&display=swap">
+<style id="appcss">
+
+:root{
+  --bg:#0B0A0F; --surface:#16141C; --surface-2:#201D2A; --surface-3:#2A2635;
+  --line:#302B3D; --line-soft:#241F30;
+  --ink:#F6F2EC; --ink-soft:#A39DB0; --ink-faint:#6E687C;
+  --accent:#FF2D78; --accent-dim:#B31C53; --accent-glow:rgba(255,45,120,.25);
+  --safe:#34D399; --warn:#FBBF24; --crit:#EF4444;
+  --safe-dim:rgba(52,211,153,.14); --warn-dim:rgba(251,191,36,.14); --crit-dim:rgba(239,68,68,.14);
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);
+  font-family:Archivo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  min-height:100vh}
+h1,h2,h3{margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.disp{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;letter-spacing:-.03em}
+.num{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ============ GATE ============ */
+.gate{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 20px;gap:40px;
+  background:radial-gradient(1100px 620px at 50% -8%, rgba(255,45,120,.13), transparent 62%), var(--bg)}
+.gate h1{font-size:clamp(30px,6vw,50px);text-align:center}
+.gate .kick{color:var(--ink-faint);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  text-align:center;margin-bottom:12px;font-weight:600}
+.profiles{display:flex;flex-wrap:wrap;gap:26px;justify-content:center;max-width:820px}
+.prof{display:flex;flex-direction:column;align-items:center;gap:12px;width:132px;
+  transition:transform .22s cubic-bezier(.2,.8,.3,1)}
+.prof:hover,.prof:focus-visible{transform:scale(1.09)}
+.av{width:120px;height:120px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:44px;font-weight:800;font-family:"Bricolage Grotesque",Archivo,sans-serif;color:#0B0A0F;
+  border:3px solid transparent;transition:border-color .2s, box-shadow .2s;letter-spacing:-.02em}
+.prof:hover .av,.prof:focus-visible .av{border-color:var(--ink);box-shadow:0 0 0 6px rgba(246,242,236,.06)}
+.prof .pn{font-size:15px;font-weight:600;color:var(--ink-soft);text-align:center;line-height:1.3}
+.prof:hover .pn{color:var(--ink)}
+.prof .ps{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+.av.new{background:transparent;border:2px dashed var(--line);color:var(--ink-faint);font-size:38px;font-weight:400}
+.gate .foot{color:var(--ink-faint);font-size:12.5px;text-align:center;max-width:46ch;line-height:1.6}
+
+/* ============ SHELL ============ */
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 90px}
+.bar{position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg, var(--bg) 62%, rgba(11,10,15,.86) 100%);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft)}
+.barin{max-width:1180px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:12px}
+.logo{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:800;font-size:21px;
+  letter-spacing:-.035em;color:var(--accent);text-transform:uppercase}
+.logo b{color:var(--ink);font-weight:800}
+.bar .sp{flex:1}
+.icon{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:var(--surface);
+  display:flex;align-items:center;justify-content:center;font-size:15px;transition:border-color .18s,background .18s}
+.icon:hover{border-color:var(--accent);background:var(--surface-2)}
+.icon[aria-pressed="true"]{color:var(--ink-faint)}
+.whoami{display:flex;align-items:center;gap:9px;padding:5px 12px 5px 5px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);transition:border-color .18s}
+.whoami:hover{border-color:var(--accent)}
+.whoami .mini{width:27px;height:27px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:12px;color:#0B0A0F;font-family:"Bricolage Grotesque",Archivo,sans-serif}
+.whoami .t{font-size:13px;font-weight:600}
+.save{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink-faint);white-space:nowrap}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);flex:none}
+.save[data-s="saved"] .dot{background:var(--safe)}
+.save[data-s="saving"] .dot{background:var(--warn);animation:pulse 1s infinite}
+.save[data-s="off"] .dot,.save[data-s="readonly"] .dot,.save[data-s="error"] .dot,.save[data-s="conflict"] .dot{background:var(--crit)}
+@keyframes pulse{50%{opacity:.3}}
+
+/* ============ HERO ============ */
+.hero{position:relative;margin:26px 0 34px;padding:34px 32px;border-radius:20px;overflow:hidden;
+  background:linear-gradient(112deg, var(--surface-2) 0%, var(--surface) 58%, var(--bg) 100%);
+  border:1px solid var(--line)}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(620px 300px at 88% 0%, var(--accent-glow), transparent 66%)}
+.hero .lab{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.hero .big{font-size:clamp(46px,10vw,86px);line-height:.94;margin:12px 0 8px;position:relative}
+.hero .big span{color:var(--ink-faint);font-size:.32em;letter-spacing:-.01em}
+.hero .sub{color:var(--ink-soft);font-size:15px;max-width:52ch;position:relative}
+.hero .sub b{color:var(--ink)}
+.tight{display:inline-block;line-height:1.45;margin-top:18px;padding:7px 15px;border-radius:16px;max-width:100%;
+  font-size:13px;font-weight:600;position:relative}
+.tight.safe{background:var(--safe-dim);color:var(--safe)}
+.tight.warn{background:var(--warn-dim);color:var(--warn)}
+.tight.crit{background:var(--crit-dim);color:var(--crit)}
+
+/* ============ ROW HEADINGS ============ */
+.rowhead{display:flex;align-items:baseline;gap:12px;margin:34px 0 14px}
+.rowhead h2{font-size:19px;font-weight:700;letter-spacing:-.01em;font-family:"Bricolage Grotesque",Archivo,sans-serif}
+.rowhead .hint{font-size:12.5px;color:var(--ink-faint)}
+
+/* ============ TODAY STRIP ============ */
+.today{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:11px}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 14px;
+  display:flex;flex-direction:column;gap:11px}
+.tcard .tn{font-size:13.5px;font-weight:600;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.tcard .tn i{font-style:normal;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;
+  font-variant-numeric:tabular-nums}
+.tcard .tn i.safe{background:var(--safe-dim);color:var(--safe)}
+.tcard .tn i.warn{background:var(--warn-dim);color:var(--warn)}
+.tcard .tn i.crit{background:var(--crit-dim);color:var(--crit)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.bt{padding:9px 6px;border-radius:9px;font-size:12.5px;font-weight:700;letter-spacing:.01em;
+  border:1px solid var(--line);background:var(--surface-2);transition:transform .12s, background .16s, border-color .16s}
+.bt:hover{transform:translateY(-2px)}
+.bt.went:hover{background:var(--safe-dim);border-color:var(--safe);color:var(--safe)}
+.bt.skip:hover{background:var(--crit-dim);border-color:var(--crit);color:var(--crit)}
+.bt:active{transform:translateY(0) scale(.97)}
+
+/* ============ COURSE CARDS ============ */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;
+  position:relative;overflow:hidden;transition:transform .2s cubic-bezier(.2,.8,.3,1), border-color .2s, box-shadow .2s}
+.card:hover{transform:translateY(-4px);border-color:var(--line);box-shadow:0 18px 44px -22px rgba(0,0,0,.9)}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.card.safe::before{background:var(--safe)} .card.warn::before{background:var(--warn)} .card.crit::before{background:var(--crit)}
+.card.crit{border-color:rgba(239,68,68,.34)}
+.chead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.cname{font-weight:700;font-size:16px;line-height:1.22;font-family:"Bricolage Grotesque",Archivo,sans-serif}
+.cmeta{font-size:11.5px;color:var(--ink-faint);margin-top:4px;font-variant-numeric:tabular-nums}
+.bunks{text-align:right;flex:none;line-height:1}
+.bunks b{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-size:42px;font-weight:800;display:block;
+  font-variant-numeric:tabular-nums;letter-spacing:-.045em}
+.bunks span{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;
+  display:block;margin-top:3px}
+.card.safe .bunks b{color:var(--safe)} .card.warn .bunks b{color:var(--warn)} .card.crit .bunks b{color:var(--crit)}
+.meter{display:flex;gap:4px;margin:16px 0 6px}
+.blk{height:8px;flex:1;border-radius:3px;background:var(--surface-3);transition:background .25s}
+.blk.used{background:var(--crit)} .blk.free{background:var(--safe);opacity:.45}
+.mlab{font-size:11px;color:var(--ink-faint);display:flex;justify-content:space-between;gap:8px}
+.mlab b{color:var(--crit);font-weight:700}
+.acts{display:grid;grid-template-columns:1fr 1fr auto auto;gap:7px;margin-top:15px}
+.acts .bt{padding:11px 8px;font-size:13px}
+.mini-bt{width:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:14px}
+.fix{margin-top:13px;border-top:1px solid var(--line-soft);padding-top:12px}
+.fixh{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;
+  display:flex;align-items:center;gap:7px}
+.strip{display:flex;flex-wrap:wrap;gap:4px;margin-top:11px}
+.cell{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--surface-2);
+  font-size:10px;font-weight:700;color:var(--ink-faint);display:flex;align-items:center;justify-content:center;
+  font-variant-numeric:tabular-nums;transition:transform .1s}
+.cell:hover{transform:scale(1.14)}
+.cell.P{background:var(--safe-dim);border-color:var(--safe);color:var(--safe)}
+.cell.A{background:var(--crit-dim);border-color:var(--crit);color:var(--crit)}
+.cell.C{border-style:dashed;color:var(--ink-faint);text-decoration:line-through}
+.plan{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink-faint);margin-top:12px}
+.plan input{width:56px;padding:5px 7px;border:1px solid var(--line);border-radius:7px;
+  background:var(--bg);color:var(--ink);font:inherit;font-size:12px;text-align:center}
+
+/* ============ GROUP ============ */
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:12px 13px;text-align:center;border-bottom:1px solid var(--line-soft);white-space:nowrap}
+th{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;
+  background:var(--surface-2)}
+td.who{text-align:left;font-weight:600;display:flex;align-items:center;gap:10px}
+td.who .mini{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:12px;color:#0B0A0F;flex:none;font-family:"Bricolage Grotesque",Archivo,sans-serif}
+td.who small{display:block;font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+.pill{display:inline-block;min-width:32px;padding:4px 9px;border-radius:999px;font-weight:700;font-size:12px;
+  font-variant-numeric:tabular-nums}
+.pill.safe{background:var(--safe-dim);color:var(--safe)}
+.pill.warn{background:var(--warn-dim);color:var(--warn)}
+.pill.crit{background:var(--crit-dim);color:var(--crit)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--surface-2)}
+
+.tabs{display:flex;gap:5px;margin:24px 0 0}
+.tab{padding:8px 17px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink-faint);
+  border:1px solid transparent;transition:color .16s,background .16s,border-color .16s}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.note{font-size:12.5px;color:var(--ink-faint);margin-top:18px;max-width:66ch;line-height:1.65}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(0);z-index:60;
+  background:var(--surface-3);border:1px solid var(--line);color:var(--ink);padding:11px 18px;border-radius:999px;
+  font-size:13px;font-weight:600;box-shadow:0 14px 40px -14px rgba(0,0,0,.9);pointer-events:none;
+  opacity:0;transition:opacity .2s, transform .2s}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(-6px)}
+.stagger{animation:up .38s cubic-bezier(.2,.8,.3,1) both}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ============ DAY VIEW ============ */
+.daynav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.daynav .nb{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+  display:flex;align-items:center;justify-content:center;font-size:16px;transition:border-color .16s,background .16s}
+.daynav .nb:hover{border-color:var(--accent);background:var(--surface-2)}
+.daynav .nb[disabled]{opacity:.3;cursor:default}
+.daynav .dlab{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-weight:700;font-size:19px;letter-spacing:-.01em}
+.daynav .dsub{font-size:12px;color:var(--ink-faint);margin-top:1px}
+.daynav .today-bt{margin-left:auto;padding:8px 15px;border-radius:999px;border:1px solid var(--line);
+  background:var(--surface);font-size:12.5px;font-weight:600;transition:border-color .16s}
+.daynav .today-bt:hover{border-color:var(--accent)}
+.pending{display:inline-flex;align-items:center;gap:8px;padding:8px 15px;border-radius:999px;
+  background:var(--warn-dim);color:var(--warn);font-size:12.5px;font-weight:600;border:0}
+
+.slots{display:flex;flex-direction:column;gap:9px}
+.slot{display:grid;grid-template-columns:74px 1fr auto;gap:14px;align-items:center;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+  transition:border-color .18s}
+.slot.P{border-color:rgba(52,211,153,.45)} .slot.A{border-color:rgba(239,68,68,.45)}
+.slot.C{border-color:var(--line);opacity:.6}
+.slot .tm{font-size:13px;font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.slot .cn{font-size:14.5px;font-weight:600;line-height:1.25}
+.slot .pf{font-size:11.5px;color:var(--ink-faint);margin-top:2px}
+.slot .st{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-top:4px}
+.slot.P .st{color:var(--safe)} .slot.A .st{color:var(--crit)} .slot.C .st{color:var(--ink-faint)}
+.slot .btns{display:flex;gap:6px}
+.sb{width:44px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;
+  transition:transform .12s,background .16s,border-color .16s,color .16s}
+.sb:hover{transform:translateY(-2px)}
+.sb:active{transform:scale(.94)}
+.sb.y:hover,.sb.y[aria-pressed="true"]{background:var(--safe-dim);border-color:var(--safe);color:var(--safe)}
+.sb.n:hover,.sb.n[aria-pressed="true"]{background:var(--crit-dim);border-color:var(--crit);color:var(--crit)}
+.sb.c:hover,.sb.c[aria-pressed="true"]{background:var(--surface-3);border-color:var(--ink-faint);color:var(--ink-soft)}
+.slot.evt{grid-template-columns:74px 1fr;background:var(--surface-2);border-style:dashed}
+.slot.evt .cn{color:var(--ink-soft)}
+.freeday{padding:34px 20px;text-align:center;background:var(--surface);border:1px dashed var(--line);
+  border-radius:12px;color:var(--ink-soft)}
+.freeday b{display:block;font-family:"Bricolage Grotesque",Archivo,sans-serif;font-size:22px;color:var(--ink);
+  margin-bottom:5px;font-weight:800}
+
+/* ============ AVATARS ============ */
+.av svg,.mini svg{width:100%;height:100%;display:block}
+.av{overflow:hidden;padding:0}
+.mini{overflow:hidden}
+
+/* ============ FORMS / PANEL ============ */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;
+  width:100%;max-width:520px;display:flex;flex-direction:column;gap:18px}
+.panel h2{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.fld{display:flex;flex-direction:column;gap:8px}
+.fld label{font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+.fld input[type=text],.fld input[type=url]{padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);font:inherit;font-size:15px;width:100%}
+.fld input:focus{border-color:var(--accent);outline:none}
+.segs{display:flex;gap:8px;flex-wrap:wrap}
+.seg{padding:10px 20px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);
+  font-weight:700;font-size:14px;transition:background .16s,border-color .16s,color .16s}
+.seg:hover{border-color:var(--accent-dim)}
+.seg[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.avgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:10px}
+.avpick{aspect-ratio:1;border-radius:11px;color:#0B0A0F;overflow:hidden;border:3px solid transparent;
+  transition:transform .16s,border-color .16s}
+.avpick:hover{transform:scale(1.07)}
+.avpick[aria-pressed="true"]{border-color:var(--ink)}
+.prow{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.pb{padding:12px 22px;border-radius:10px;font-weight:700;font-size:14px;border:1px solid var(--line);
+  background:var(--surface-2);transition:background .16s,border-color .16s}
+.pb:hover{border-color:var(--ink-faint)}
+.pb.go{background:var(--accent);border-color:var(--accent);color:#fff}
+.pb.go:hover{filter:brightness(1.12)}
+.pb[disabled]{opacity:.4;cursor:default}
+.phelp{font-size:12.5px;color:var(--ink-faint);line-height:1.6}
+.phelp code{background:var(--surface-2);padding:2px 6px;border-radius:5px;font-size:11.5px;
+  color:var(--ink-soft);word-break:break-all}
+.gate .panel{margin:0 auto}
+
+/* ============ CATCH-UP ============ */
+.banner{display:flex;gap:14px;align-items:flex-start;padding:15px 18px;border-radius:12px;margin-bottom:18px;
+  background:var(--surface-2);border:1px solid var(--line)}
+.banner.on{border-color:var(--accent);background:linear-gradient(100deg,rgba(255,45,120,.13),var(--surface-2))}
+.banner .bt2{font-size:13px;line-height:1.55;color:var(--ink-soft);flex:1}
+.banner .bt2 b{color:var(--ink)}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  display:flex;align-items:center;gap:14px;border-left:3px solid var(--line)}
+.q.safe{border-left-color:var(--safe)} .q.warn{border-left-color:var(--warn)} .q.crit{border-left-color:var(--crit)}
+.q .qn{flex:1;min-width:0}
+.q .qt{font-weight:700;font-size:14.5px;line-height:1.25}
+.q .qs{font-size:11.5px;color:var(--ink-faint);margin-top:3px;font-variant-numeric:tabular-nums}
+.step{display:flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;flex:none}
+.step button{width:38px;height:40px;background:var(--surface-2);font-size:18px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+.step button:hover{background:var(--surface-3);color:var(--accent)}
+.step button[disabled]{opacity:.3;cursor:default}
+.step .val{width:44px;text-align:center;font-weight:800;font-size:17px;font-variant-numeric:tabular-nums;
+  font-family:"Bricolage Grotesque",Archivo,sans-serif}
+.q .qleft{flex:none;text-align:right;min-width:56px}
+.q .qleft b{font-family:"Bricolage Grotesque",Archivo,sans-serif;font-size:26px;font-weight:800;display:block;
+  line-height:1;font-variant-numeric:tabular-nums}
+.q .qleft span{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+.q.safe .qleft b{color:var(--safe)} .q.warn .qleft b{color:var(--warn)} .q.crit .qleft b{color:var(--crit)}
+
+/* ============ PHONES ============ */
+@media (max-width:620px){
+  .barin{padding:11px 14px;gap:8px}
+  .logo{font-size:17px}
+  .save span{display:none}
+  .save{gap:0}
+  .icon{width:34px;height:34px}
+  .whoami{padding:4px 10px 4px 4px;gap:7px;min-width:0}
+  .whoami .t{max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .whoami .mini{width:25px;height:25px}
+
+  .wrap{padding:0 14px 84px}
+  .hero{margin:18px 0 24px;padding:24px 18px;border-radius:16px}
+  .hero .sub{font-size:14px}
+
+  .tabs{margin:20px -14px 0;padding:0 14px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none;padding:8px 14px;font-size:13px;white-space:nowrap}
+
+  .slot{grid-template-columns:56px 1fr;gap:6px 12px;padding:12px 13px}
+  .slot .btns{grid-column:1 / -1;justify-content:flex-end;margin-top:2px}
+  .slot.evt{grid-template-columns:56px 1fr}
+  .sb{width:52px;height:42px}
+
+  .cards{grid-template-columns:1fr}
+  .daynav .today-bt,.daynav .pending{margin-left:0;width:100%;text-align:center}
+
+  .q{gap:10px;padding:13px 13px;flex-wrap:wrap}
+  .q .qn{flex:1 1 100%;order:1}
+  .step{order:2}
+  .q .qleft{order:3;margin-left:auto}
+  .step button{width:46px;height:42px}
+  .step .val{width:42px}
+
+  .prof{width:112px}
+  .gate{padding:34px 16px}
+  .avgrid{grid-template-columns:repeat(auto-fill,minmax(56px,1fr))}
+  .toast{left:14px;right:14px;bottom:16px;transform:none;text-align:center}
+}
+@media (max-width:380px){
+  .sb{width:46px}
+  .whoami .t{display:none}
+}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toast" id="toast"></div>
+<script id="sched" type="application/json">{"A":{"2026-10-05":[["09:15","mm2","Swapnarag Swain"],["13:30","wip","Anamita Guha"],["15:15","mac","Anirban Sengupta"],["17:00","x:Term registration",""]],"2026-10-06":[["11:00","ob2","Abhyudaya Anand Mishra"]],"2026-10-07":[["09:15","or","Prabhat Ranjan"],["11:00","mm2","Swapnarag Swain"],["13:30","mac","Anirban Sengupta"],["15:15","fm","Ashish Sharma"]],"2026-10-08":[["09:15","dt","Vishal Ashok Wankhede"],["11:00","wip","Anamita Guha"],["15:15","ob2","Abhyudaya Anand Mishra"]],"2026-10-09":[["09:15","or","Prabhat Ranjan"],["11:00","mac","Anirban Sengupta"],["13:30","mm2","Swapnarag Swain"],["15:15","fm","Ashish Sharma"],["17:00","dt","Vishal Ashok Wankhede"]],"2026-10-12":[["09:15","mm2","Swapnarag Swain"],["11:00","or","Prabhat Ranjan"],["13:30","dt","Vishal Ashok Wankhede"],["15:15","mac","Anirban Sengupta"],["17:00","ob2","Abhyudaya Anand Mishra"]],"2026-10-13":[["13:30","fm","Ashish Sharma"]],"2026-10-14":[["09:15","ob2","Abhyudaya Anand Mishra"],["11:00","or","Prabhat Ranjan"],["13:30","mac","Anirban Sengupta"],["15:15","mm2","Swapnarag Swain"],["17:00","dt","Vishal Ashok Wankhede"]],"2026-10-15":[["09:15","wip","Anamita Guha"],["13:30","fm","Ashish Sharma"],["17:00","mac","Anirban Sengupta"]],"2026-10-16":[["09:15","ob2","Abhyudaya Anand Mishra"],["11:00","mm2","Swapnarag Swain"],["17:00","fm","Ashish Sharma"]],"2026-10-17":[["09:15","x:Dussehra holidays",""]],"2026-10-18":[["09:15","x:Dussehra holidays",""]],"2026-10-19":[["09:15","x:Dussehra holidays",""]],"2026-10-20":[["09:15","x:Dussehra holidays",""]],"2026-10-21":[["09:15","dt","Vishal Ashok Wankhede"]],"2026-10-22":[["09:15","or","Prabhat Ranjan"],["11:00","dt","Vishal Ashok Wankhede"]],"2026-10-23":[["15:15","ob2","Abhyudaya Anand Mishra"]],"2026-10-26":[["09:15","mac","Anirban Sengupta"],["11:00","mm2","Swapnarag Swain"],["15:15","or","Prabhat Ranjan"]],"2026-10-27":[["11:00","wip","Anamita Guha"]],"2026-10-28":[["11:00","dt","Vishal Ashok Wankhede"],["13:30","fm","Ashish Sharma"],["15:15","ob2","Abhyudaya Anand Mishra"],["17:00","or","Prabhat Ranjan"]],"2026-10-29":[["09:15","mac","Anirban Sengupta"],["11:00","mm2","Swapnarag Swain"]],"2026-10-30":[["09:15","fm","Ashish Sharma"],["13:30","dt","Vishal Ashok Wankhede"],["15:15","or","Prabhat Ranjan"],["17:00","ob2","Abhyudaya Anand Mishra"]],"2026-11-02":[["11:00","mac","Anirban Sengupta"],["15:15","dt","Vishal Ashok Wankhede"]],"2026-11-03":[["09:15","ob2","Abhyudaya Anand Mishra"],["11:00","mm2","Swapnarag Swain"],["13:30","or","Prabhat Ranjan"]],"2026-11-04":[["09:15","dt","Vishal Ashok Wankhede"],["13:30","wip","Anamita Guha"]],"2026-11-05":[["09:15","ob2","Abhyudaya Anand Mishra"],["11:00","mac","Anirban Sengupta"],["13:30","fm","Ashish Sharma"],["15:15","or","Prabhat Ranjan"],["17:00","mm2","Swapnarag Swain"]],"2026-11-06":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-11-07":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-11-08":[["09:15","x:Diwali holiday",""]],"2026-11-09":[["09:15","x:Mid-term exams",""]],"2026-11-10":[["09:15","x:Mid-term exams",""]],"2026-11-11":[["09:15","x:Mid-term exams",""]],"2026-11-12":[["09:15","x:Mid-term exams",""]],"2026-11-13":[["09:15","x:Mid-term exams",""]],"2026-11-14":[["09:15","x:Mid-term exams",""]],"2026-11-16":[["09:15","x:Chhath holiday",""]],"2026-11-17":[["09:15","mm2","Swapnarag Swain"],["11:00","or","Prabhat Ranjan"],["15:15","ma2","Archana Patro"]],"2026-11-18":[["09:15","mm2","Swapnarag Swain"],["11:00","or","Prabhat Ranjan"],["13:30","wip","Anamita Guha"],["15:15","ent","Loitongbam Athouba Meetei"],["17:00","mac","Anirban Sengupta"]],"2026-11-19":[["09:15","fm","Ashish Sharma"],["13:30","hrm","Prachi Thakur"]],"2026-11-20":[["09:15","or","Prabhat Ranjan"],["11:00","mm2","Swapnarag Swain"],["13:30","ent","Loitongbam Athouba Meetei"],["15:15","ma2","Archana Patro"],["17:00","mac","Anirban Sengupta"]],"2026-11-23":[["09:15","mm2","Swapnarag Swain"],["11:00","hrm","Prachi Thakur"],["13:30","ent","Loitongbam Athouba Meetei"],["15:15","mac","Anirban Sengupta"],["17:00","or","Prabhat Ranjan"]],"2026-11-24":[["09:15","x:Guru Nanak Jayanti",""]],"2026-11-25":[["09:15","ent","Loitongbam Athouba Meetei"],["13:30","ma2","Archana Patro"],["15:15","fm","Ashish Sharma"],["17:00","mm2","Swapnarag Swain"]],"2026-11-26":[["11:00","mac","Anirban Sengupta"]],"2026-11-27":[["09:15","hrm","Prachi Thakur"],["11:00","ent","Loitongbam Athouba Meetei"],["13:30","fm","Ashish Sharma"],["15:15","or","Prabhat Ranjan"],["17:00","ma2","Archana Patro"]],"2026-11-28":[["09:15","x:Netritva",""]],"2026-11-30":[["11:00","mm2","Swapnarag Swain"],["13:30","ent","Loitongbam Athouba Meetei"],["15:15","mac","Anirban Sengupta"]],"2026-12-01":[["09:15","or","Prabhat Ranjan"],["13:30","ma2","Archana Patro"],["15:15","hrm","Prachi Thakur"]],"2026-12-02":[["09:15","mm2","Swapnarag Swain"],["11:00","mac","Anirban Sengupta"],["13:30","fm","Ashish Sharma"]],"2026-12-03":[["09:15","or","Prabhat Ranjan"],["11:00","ent","Loitongbam Athouba Meetei"],["15:15","ma2","Archana Patro"],["17:00","hrm","Prachi Thakur"]],"2026-12-04":[["09:15","x:TEDx",""]],"2026-12-07":[["09:15","ent","Loitongbam Athouba Meetei"],["11:00","fm","Ashish Sharma"],["13:30","hrm","Prachi Thakur"],["17:00","ma2","Archana Patro"]],"2026-12-08":[["09:15","or","Prabhat Ranjan"],["11:00","mm2","Swapnarag Swain"],["13:30","mac","Anirban Sengupta"]],"2026-12-09":[["11:00","wip","Anamita Guha"],["13:30","hrm","Prachi Thakur"],["15:15","fm","Ashish Sharma"]],"2026-12-10":[["09:15","or","Prabhat Ranjan"],["11:00","ent","Loitongbam Athouba Meetei"],["15:15","ma2","Archana Patro"]],"2026-12-11":[["11:00","mac","Anirban Sengupta"],["15:15","hrm","Prachi Thakur"]],"2026-12-14":[["09:15","mac","Anirban Sengupta"],["11:00","hrm","Prachi Thakur"],["13:30","mm2","Swapnarag Swain"],["17:00","ma2","Archana Patro"]],"2026-12-15":[["09:15","or","Prabhat Ranjan"],["11:00","ent","Loitongbam Athouba Meetei"]],"2026-12-16":[["09:15","fm","Ashish Sharma"],["11:00","mm2","Swapnarag Swain"],["13:30","ma2","Archana Patro"],["15:15","mac","Anirban Sengupta"],["17:00","hrm","Prachi Thakur"]],"2026-12-17":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-18":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-19":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-20":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-21":[["09:15","x:End-term exams",""]],"2026-12-22":[["09:15","x:End-term exams",""]],"2026-12-23":[["09:15","x:End-term exams",""]],"2026-12-24":[["09:15","x:End-term exams",""]]},"B":{"2026-10-05":[["09:15","mm2","Medha Srivastava"],["11:00","wip","Sanjay Kaushal"],["13:30","x:Term registration",""],["15:15","mac","Aviral Kumar Tiwari"]],"2026-10-06":[["11:00","ob2","Manoj Kumar Jaiswal"],["13:30","fm","Molla Ramizur Rahman"]],"2026-10-07":[["09:15","dt","Ramesh Kumar"],["11:00","mm2","Medha Srivastava"],["13:30","mac","Aviral Kumar Tiwari"]],"2026-10-08":[["09:15","wip","Sanjay Kaushal"],["11:00","or","Vishal Ashok Wankhede"],["13:30","ob2","Manoj Kumar Jaiswal"]],"2026-10-09":[["09:15","or","Vishal Ashok Wankhede"],["11:00","mac","Aviral Kumar Tiwari"],["13:30","mm2","Medha Srivastava"],["15:15","fm","Molla Ramizur Rahman"],["17:00","dt","Ramesh Kumar"]],"2026-10-12":[["09:15","mm2","Medha Srivastava"],["11:00","or","Vishal Ashok Wankhede"],["13:30","mac","Aviral Kumar Tiwari"]],"2026-10-13":[["09:15","dt","Ramesh Kumar"],["13:30","fm","Molla Ramizur Rahman"],["15:15","ob2","Manoj Kumar Jaiswal"]],"2026-10-14":[["09:15","ob2","Manoj Kumar Jaiswal"],["11:00","or","Vishal Ashok Wankhede"],["13:30","mac","Aviral Kumar Tiwari"],["15:15","mm2","Medha Srivastava"]],"2026-10-15":[["09:15","dt","Ramesh Kumar"],["11:00","wip","Sanjay Kaushal"],["13:30","fm","Molla Ramizur Rahman"]],"2026-10-16":[["09:15","ob2","Manoj Kumar Jaiswal"],["11:00","mm2","Medha Srivastava"],["13:30","mac","Aviral Kumar Tiwari"]],"2026-10-17":[["09:15","x:Dussehra holidays",""]],"2026-10-18":[["09:15","x:Dussehra holidays",""]],"2026-10-19":[["09:15","x:Dussehra holidays",""]],"2026-10-20":[["09:15","x:Dussehra holidays",""]],"2026-10-21":[["09:15","dt","Ramesh Kumar"],["11:00","ob2","Manoj Kumar Jaiswal"]],"2026-10-22":[["09:15","or","Vishal Ashok Wankhede"]],"2026-10-23":[["09:15","fm","Molla Ramizur Rahman"],["11:00","ob2","Manoj Kumar Jaiswal"],["13:30","mm2","Medha Srivastava"],["17:00","mac","Aviral Kumar Tiwari"]],"2026-10-26":[["15:15","or","Vishal Ashok Wankhede"],["17:00","dt","Ramesh Kumar"]],"2026-10-27":[["09:15","wip","Sanjay Kaushal"],["15:15","ob2","Manoj Kumar Jaiswal"]],"2026-10-28":[["11:00","dt","Ramesh Kumar"],["13:30","fm","Molla Ramizur Rahman"],["17:00","or","Vishal Ashok Wankhede"],["18:45","ob2","Manoj Kumar Jaiswal"]],"2026-10-29":[["09:15","mac","Aviral Kumar Tiwari"],["11:00","mm2","Medha Srivastava"],["17:00","ob2","Manoj Kumar Jaiswal"]],"2026-10-30":[["09:15","fm","Molla Ramizur Rahman"],["13:30","dt","Ramesh Kumar"],["15:15","or","Vishal Ashok Wankhede"]],"2026-11-02":[["09:15","ob2","Manoj Kumar Jaiswal"],["11:00","mac","Aviral Kumar Tiwari"],["15:15","dt","Ramesh Kumar"]],"2026-11-03":[["09:15","or","Vishal Ashok Wankhede"],["11:00","mm2","Medha Srivastava"]],"2026-11-04":[["09:15","dt","Ramesh Kumar"],["11:00","wip","Sanjay Kaushal"]],"2026-11-05":[["11:00","mac","Aviral Kumar Tiwari"],["13:30","fm","Molla Ramizur Rahman"],["15:15","or","Vishal Ashok Wankhede"],["17:00","mm2","Medha Srivastava"]],"2026-11-06":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-11-07":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-11-08":[["09:15","x:Diwali holiday",""]],"2026-11-09":[["09:15","x:Mid-term exams",""]],"2026-11-10":[["09:15","x:Mid-term exams",""]],"2026-11-11":[["09:15","x:Mid-term exams",""]],"2026-11-12":[["09:15","x:Mid-term exams",""]],"2026-11-13":[["09:15","x:Mid-term exams",""]],"2026-11-14":[["09:15","x:Mid-term exams",""]],"2026-11-15":[["17:00","or","Vishal Ashok Wankhede"]],"2026-11-16":[["09:15","x:Chhath holiday",""]],"2026-11-17":[["09:15","mm2","Medha Srivastava"],["13:30","ma2","Neetu Chhilar"],["17:00","or","Vishal Ashok Wankhede"]],"2026-11-18":[["09:15","mm2","Medha Srivastava"],["13:30","wip","Sanjay Kaushal"],["15:15","ent","Surabhi Singh"],["17:00","mac","Aviral Kumar Tiwari"]],"2026-11-19":[["09:15","fm","Molla Ramizur Rahman"],["13:30","hrm","Tarun Kumar Vashisth"],["17:00","or","Vishal Ashok Wankhede"]],"2026-11-20":[["09:15","mm2","Medha Srivastava"],["11:00","mac","Aviral Kumar Tiwari"],["13:30","ent","Surabhi Singh"],["15:15","ma2","Neetu Chhilar"],["17:00","or","Vishal Ashok Wankhede"]],"2026-11-23":[["09:15","mm2","Medha Srivastava"],["11:00","hrm","Tarun Kumar Vashisth"],["13:30","ent","Surabhi Singh"],["15:15","mac","Aviral Kumar Tiwari"]],"2026-11-24":[["09:15","x:Guru Nanak Jayanti",""]],"2026-11-25":[["09:15","ent","Surabhi Singh"],["11:00","ma2","Neetu Chhilar"],["15:15","fm","Molla Ramizur Rahman"]],"2026-11-26":[["09:15","mm2","Medha Srivastava"],["11:00","mac","Aviral Kumar Tiwari"]],"2026-11-27":[["09:15","hrm","Tarun Kumar Vashisth"],["11:00","ent","Surabhi Singh"],["13:30","fm","Molla Ramizur Rahman"],["15:15","ma2","Neetu Chhilar"]],"2026-11-28":[["09:15","x:Netritva",""]],"2026-11-30":[["09:15","or","Vishal Ashok Wankhede"],["11:00","mm2","Medha Srivastava"],["13:30","ent","Surabhi Singh"],["15:15","mac","Aviral Kumar Tiwari"]],"2026-12-01":[["09:15","or","Vishal Ashok Wankhede"],["11:00","ma2","Neetu Chhilar"],["15:15","hrm","Tarun Kumar Vashisth"]],"2026-12-02":[["09:15","mm2","Medha Srivastava"],["11:00","mac","Aviral Kumar Tiwari"],["13:30","fm","Molla Ramizur Rahman"]],"2026-12-03":[["09:15","or","Vishal Ashok Wankhede"],["11:00","ent","Surabhi Singh"],["13:30","ma2","Neetu Chhilar"],["17:00","hrm","Tarun Kumar Vashisth"]],"2026-12-04":[["09:15","x:TEDx",""]],"2026-12-07":[["09:15","ent","Surabhi Singh"],["11:00","fm","Molla Ramizur Rahman"],["13:30","hrm","Tarun Kumar Vashisth"],["15:15","ma2","Neetu Chhilar"]],"2026-12-08":[["09:15","or","Vishal Ashok Wankhede"],["11:00","mm2","Medha Srivastava"],["13:30","mac","Aviral Kumar Tiwari"]],"2026-12-09":[["09:15","wip","Sanjay Kaushal"],["13:30","hrm","Tarun Kumar Vashisth"],["15:15","fm","Molla Ramizur Rahman"]],"2026-12-10":[["09:15","or","Vishal Ashok Wankhede"],["11:00","ent","Surabhi Singh"],["13:30","ma2","Neetu Chhilar"]],"2026-12-11":[["09:15","hrm","Tarun Kumar Vashisth"],["11:00","mac","Aviral Kumar Tiwari"]],"2026-12-14":[["09:15","mac","Aviral Kumar Tiwari"],["11:00","hrm","Tarun Kumar Vashisth"],["13:30","mm2","Medha Srivastava"],["15:15","ma2","Neetu Chhilar"]],"2026-12-15":[["09:15","or","Vishal Ashok Wankhede"],["11:00","ent","Surabhi Singh"]],"2026-12-16":[["09:15","fm","Molla Ramizur Rahman"],["11:00","mm2","Medha Srivastava"],["13:30","ma2","Neetu Chhilar"],["15:15","mac","Aviral Kumar Tiwari"],["17:00","hrm","Tarun Kumar Vashisth"]],"2026-12-17":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-18":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-19":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-20":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-21":[["09:15","x:End-term exams",""]],"2026-12-22":[["09:15","x:End-term exams",""]],"2026-12-23":[["09:15","x:End-term exams",""]],"2026-12-24":[["09:15","x:End-term exams",""]]},"C":{"2026-10-05":[["09:15","mm2","Chandan Parsad"],["11:00","wip","Anamita Guha"],["13:30","x:Term registration",""],["15:15","mac","Gupteswar Patel"]],"2026-10-06":[["11:00","ob2","Sudipt Kumar"],["13:30","fm","Bharati Singh"]],"2026-10-07":[["09:15","or","Rohit Agrawal"],["11:00","mm2","Chandan Parsad"],["13:30","mac","Gupteswar Patel"],["15:15","dt","Bishal Dey Sarkar"]],"2026-10-08":[["09:15","wip","Anamita Guha"],["15:15","ob2","Sudipt Kumar"],["17:00","dt","Bishal Dey Sarkar"]],"2026-10-09":[["09:15","or","Rohit Agrawal"],["11:00","mac","Gupteswar Patel"],["13:30","mm2","Chandan Parsad"],["15:15","fm","Bharati Singh"]],"2026-10-12":[["09:15","mm2","Chandan Parsad"],["11:00","or","Rohit Agrawal"],["13:30","ob2","Sudipt Kumar"],["15:15","mac","Gupteswar Patel"]],"2026-10-13":[["09:15","dt","Bishal Dey Sarkar"],["13:30","fm","Bharati Singh"]],"2026-10-14":[["09:15","ob2","Sudipt Kumar"],["11:00","or","Rohit Agrawal"],["13:30","mac","Gupteswar Patel"],["15:15","mm2","Chandan Parsad"]],"2026-10-15":[["09:15","dt","Bishal Dey Sarkar"],["11:00","wip","Anamita Guha"],["13:30","fm","Bharati Singh"]],"2026-10-16":[["09:15","ob2","Sudipt Kumar"],["11:00","mm2","Chandan Parsad"],["13:30","mac","Gupteswar Patel"],["17:00","dt","Bishal Dey Sarkar"]],"2026-10-17":[["09:15","x:Dussehra holidays",""]],"2026-10-18":[["09:15","x:Dussehra holidays",""]],"2026-10-19":[["09:15","x:Dussehra holidays",""]],"2026-10-20":[["09:15","x:Dussehra holidays",""]],"2026-10-21":[["09:15","or","Rohit Agrawal"]],"2026-10-23":[["09:15","fm","Bharati Singh"],["13:30","mm2","Chandan Parsad"],["15:15","ob2","Sudipt Kumar"],["17:00","mac","Gupteswar Patel"]],"2026-10-26":[["15:15","or","Rohit Agrawal"]],"2026-10-27":[["09:15","wip","Anamita Guha"],["11:00","dt","Bishal Dey Sarkar"]],"2026-10-28":[["11:00","dt","Bishal Dey Sarkar"],["13:30","fm","Bharati Singh"],["15:15","ob2","Sudipt Kumar"],["17:00","or","Rohit Agrawal"]],"2026-10-29":[["09:15","mac","Gupteswar Patel"],["11:00","mm2","Chandan Parsad"]],"2026-10-30":[["09:15","fm","Bharati Singh"],["13:30","dt","Bishal Dey Sarkar"],["15:15","or","Rohit Agrawal"],["17:00","ob2","Sudipt Kumar"]],"2026-11-02":[["11:00","mac","Gupteswar Patel"],["15:15","dt","Bishal Dey Sarkar"],["17:00","or","Rohit Agrawal"]],"2026-11-03":[["11:00","mm2","Chandan Parsad"],["13:30","ob2","Sudipt Kumar"],["17:00","or","Rohit Agrawal"]],"2026-11-04":[["09:15","dt","Bishal Dey Sarkar"],["11:00","wip","Anamita Guha"]],"2026-11-05":[["09:15","ob2","Sudipt Kumar"],["11:00","mac","Gupteswar Patel"],["13:30","fm","Bharati Singh"],["17:00","mm2","Chandan Parsad"]],"2026-11-06":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-11-07":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-11-08":[["09:15","x:Diwali holiday",""]],"2026-11-09":[["09:15","x:Mid-term exams",""]],"2026-11-10":[["09:15","x:Mid-term exams",""]],"2026-11-11":[["09:15","x:Mid-term exams",""]],"2026-11-12":[["09:15","x:Mid-term exams",""]],"2026-11-13":[["09:15","x:Mid-term exams",""]],"2026-11-14":[["09:15","x:Mid-term exams",""]],"2026-11-16":[["09:15","x:Chhath holiday",""]],"2026-11-17":[["09:15","mm2","Chandan Parsad"],["11:00","or","Rohit Agrawal"],["13:30","ma2","Archana Patro"]],"2026-11-18":[["09:15","mm2","Chandan Parsad"],["11:00","or","Rohit Agrawal"],["15:15","wip","Anamita Guha"],["17:00","mac","Gupteswar Patel"]],"2026-11-19":[["09:15","fm","Bharati Singh"],["11:00","ent","Sunil Kumar Yadav"],["13:30","hrm","Abhyudaya Anand Mishra"]],"2026-11-20":[["09:15","or","Rohit Agrawal"],["11:00","mm2","Chandan Parsad"],["13:30","ent","Sunil Kumar Yadav"],["15:15","mac","Gupteswar Patel"],["17:00","ma2","Archana Patro"]],"2026-11-23":[["09:15","mm2","Chandan Parsad"],["13:30","ent","Sunil Kumar Yadav"],["15:15","mac","Gupteswar Patel"],["17:00","hrm","Abhyudaya Anand Mishra"],["19:45","or","Rohit Agrawal"]],"2026-11-24":[["09:15","x:Guru Nanak Jayanti",""]],"2026-11-25":[["09:15","ent","Sunil Kumar Yadav"],["11:00","ma2","Archana Patro"],["15:15","fm","Bharati Singh"]],"2026-11-26":[["09:15","mm2","Chandan Parsad"],["11:00","mac","Gupteswar Patel"]],"2026-11-27":[["09:15","hrm","Abhyudaya Anand Mishra"],["11:00","ent","Sunil Kumar Yadav"],["13:30","fm","Bharati Singh"],["15:15","ma2","Archana Patro"],["17:00","or","Rohit Agrawal"]],"2026-11-28":[["09:15","x:Netritva",""]],"2026-11-30":[["11:00","mm2","Chandan Parsad"],["13:30","ent","Sunil Kumar Yadav"],["15:15","mac","Gupteswar Patel"]],"2026-12-01":[["09:15","or","Rohit Agrawal"],["11:00","ma2","Archana Patro"],["13:30","hrm","Abhyudaya Anand Mishra"]],"2026-12-02":[["09:15","mm2","Chandan Parsad"],["11:00","mac","Gupteswar Patel"],["13:30","fm","Bharati Singh"]],"2026-12-03":[["09:15","or","Rohit Agrawal"],["11:00","ent","Sunil Kumar Yadav"],["13:30","ma2","Archana Patro"],["17:00","hrm","Abhyudaya Anand Mishra"]],"2026-12-04":[["09:15","x:TEDx",""]],"2026-12-07":[["09:15","ent","Sunil Kumar Yadav"],["11:00","fm","Bharati Singh"],["13:30","hrm","Abhyudaya Anand Mishra"],["15:15","ma2","Archana Patro"]],"2026-12-08":[["09:15","or","Rohit Agrawal"],["11:00","mm2","Chandan Parsad"],["13:30","mac","Gupteswar Patel"]],"2026-12-09":[["09:15","wip","Anamita Guha"],["13:30","hrm","Abhyudaya Anand Mishra"],["15:15","fm","Bharati Singh"]],"2026-12-10":[["09:15","or","Rohit Agrawal"],["11:00","ent","Sunil Kumar Yadav"],["13:30","ma2","Archana Patro"]],"2026-12-11":[["09:15","hrm","Abhyudaya Anand Mishra"],["11:00","mac","Gupteswar Patel"]],"2026-12-14":[["09:15","mac","Gupteswar Patel"],["11:00","hrm","Abhyudaya Anand Mishra"],["13:30","mm2","Chandan Parsad"],["15:15","ma2","Archana Patro"]],"2026-12-15":[["09:15","or","Rohit Agrawal"],["11:00","ent","Sunil Kumar Yadav"]],"2026-12-16":[["09:15","fm","Bharati Singh"],["11:00","mm2","Chandan Parsad"],["13:30","mac","Gupteswar Patel"],["15:15","ma2","Archana Patro"],["17:00","hrm","Abhyudaya Anand Mishra"]],"2026-12-17":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-18":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-19":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-20":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-21":[["09:15","x:End-term exams",""]],"2026-12-22":[["09:15","x:End-term exams",""]],"2026-12-23":[["09:15","x:End-term exams",""]],"2026-12-24":[["09:15","x:End-term exams",""]]},"D":{"2026-10-05":[["09:15","mm2","Pinaz Tiwari"],["11:00","wip","Urjani Chakravarty"],["13:30","x:Term registration",""],["15:15","mac","Suresh KG"]],"2026-10-06":[["11:00","ob2","Tarun Kumar Vashisth"],["13:30","or","Chiranjit Das"]],"2026-10-07":[["09:15","dt","Suryakant Kumar"],["11:00","mm2","Pinaz Tiwari"],["13:30","mac","Suresh KG"],["15:15","fm","Shweta Bajpai"]],"2026-10-08":[["09:15","wip","Urjani Chakravarty"],["15:15","ob2","Tarun Kumar Vashisth"],["17:00","or","Chiranjit Das"]],"2026-10-09":[["09:15","mm2","Pinaz Tiwari"],["11:00","mac","Suresh KG"],["13:30","dt","Suryakant Kumar"],["15:15","fm","Shweta Bajpai"],["17:00","or","Chiranjit Das"]],"2026-10-12":[["09:15","mm2","Pinaz Tiwari"],["11:00","or","Chiranjit Das"],["13:30","ob2","Tarun Kumar Vashisth"],["15:15","mac","Suresh KG"],["17:00","dt","Suryakant Kumar"]],"2026-10-13":[["13:30","fm","Shweta Bajpai"]],"2026-10-14":[["09:15","ob2","Tarun Kumar Vashisth"],["11:00","mm2","Pinaz Tiwari"],["13:30","mac","Suresh KG"],["15:15","or","Chiranjit Das"],["17:00","dt","Suryakant Kumar"]],"2026-10-15":[["09:15","wip","Urjani Chakravarty"],["13:30","fm","Shweta Bajpai"]],"2026-10-16":[["09:15","ob2","Tarun Kumar Vashisth"],["11:00","mm2","Pinaz Tiwari"],["13:30","mac","Suresh KG"],["17:00","dt","Suryakant Kumar"]],"2026-10-17":[["09:15","x:Dussehra holidays",""]],"2026-10-18":[["09:15","x:Dussehra holidays",""]],"2026-10-19":[["09:15","x:Dussehra holidays",""]],"2026-10-20":[["09:15","x:Dussehra holidays",""]],"2026-10-21":[["09:15","ob2","Tarun Kumar Vashisth"]],"2026-10-23":[["11:00","fm","Shweta Bajpai"],["13:30","mm2","Pinaz Tiwari"]],"2026-10-26":[["09:15","mac","Suresh KG"],["11:00","dt","Suryakant Kumar"]],"2026-10-27":[["09:15","wip","Urjani Chakravarty"]],"2026-10-28":[["09:15","or","Chiranjit Das"],["11:00","dt","Suryakant Kumar"],["13:30","fm","Shweta Bajpai"],["15:15","ob2","Tarun Kumar Vashisth"]],"2026-10-29":[["09:15","mac","Suresh KG"],["11:00","mm2","Pinaz Tiwari"]],"2026-10-30":[["09:15","or","Chiranjit Das"],["11:00","fm","Shweta Bajpai"],["13:30","dt","Suryakant Kumar"],["17:00","ob2","Tarun Kumar Vashisth"]],"2026-11-02":[["09:15","or","Chiranjit Das"],["11:00","mac","Suresh KG"],["15:15","dt","Suryakant Kumar"]],"2026-11-03":[["09:15","or","Chiranjit Das"],["11:00","mm2","Pinaz Tiwari"],["13:30","ob2","Tarun Kumar Vashisth"]],"2026-11-04":[["09:15","dt","Suryakant Kumar"],["11:00","wip","Urjani Chakravarty"]],"2026-11-05":[["09:15","ob2","Tarun Kumar Vashisth"],["11:00","mac","Suresh KG"],["13:30","fm","Shweta Bajpai"],["15:15","or","Chiranjit Das"],["17:00","mm2","Pinaz Tiwari"]],"2026-11-06":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-11-07":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-11-08":[["09:15","x:Diwali holiday",""]],"2026-11-09":[["09:15","x:Mid-term exams",""]],"2026-11-10":[["09:15","x:Mid-term exams",""]],"2026-11-11":[["09:15","x:Mid-term exams",""]],"2026-11-12":[["09:15","x:Mid-term exams",""]],"2026-11-13":[["09:15","x:Mid-term exams",""]],"2026-11-14":[["09:15","x:Mid-term exams",""]],"2026-11-15":[["17:00","mm2","Pinaz Tiwari"]],"2026-11-16":[["09:15","x:Chhath holiday",""]],"2026-11-17":[["09:15","or","Chiranjit Das"],["13:30","ma2","Somya Gupta"],["17:00","mm2","Pinaz Tiwari"]],"2026-11-18":[["09:15","or","Chiranjit Das"],["13:30","wip","Urjani Chakravarty"],["15:15","ent","Deepika R Gupta"],["17:00","mac","Suresh KG"]],"2026-11-19":[["09:15","fm","Shweta Bajpai"],["15:15","hrm","Prachi Thakur"],["17:00","mm2","Pinaz Tiwari"]],"2026-11-20":[["09:15","or","Chiranjit Das"],["11:00","mac","Suresh KG"],["13:30","ent","Deepika R Gupta"],["15:15","ma2","Somya Gupta"],["17:00","mm2","Pinaz Tiwari"]],"2026-11-23":[["09:15","or","Chiranjit Das"],["13:30","ent","Deepika R Gupta"],["15:15","mac","Suresh KG"],["17:00","hrm","Prachi Thakur"]],"2026-11-24":[["09:15","x:Guru Nanak Jayanti",""]],"2026-11-25":[["09:15","ent","Deepika R Gupta"],["11:00","ma2","Somya Gupta"],["15:15","fm","Shweta Bajpai"]],"2026-11-26":[["09:15","mm2","Pinaz Tiwari"],["11:00","mac","Suresh KG"],["13:30","hrm","Prachi Thakur"]],"2026-11-27":[["09:15","ma2","Somya Gupta"],["11:00","ent","Deepika R Gupta"],["17:00","or","Chiranjit Das"]],"2026-11-28":[["09:15","x:Netritva",""]],"2026-11-30":[["11:00","mm2","Pinaz Tiwari"],["13:30","ent","Deepika R Gupta"],["15:15","mac","Suresh KG"]],"2026-12-01":[["09:15","or","Chiranjit Das"],["11:00","ma2","Somya Gupta"],["13:30","hrm","Prachi Thakur"]],"2026-12-02":[["09:15","mm2","Pinaz Tiwari"],["11:00","mac","Suresh KG"],["13:30","fm","Shweta Bajpai"],["15:15","hrm","Prachi Thakur"]],"2026-12-03":[["09:15","or","Chiranjit Das"],["11:00","ent","Deepika R Gupta"],["13:30","ma2","Somya Gupta"]],"2026-12-04":[["09:15","x:TEDx",""]],"2026-12-07":[["09:15","ent","Deepika R Gupta"],["11:00","fm","Shweta Bajpai"],["15:15","ma2","Somya Gupta"]],"2026-12-08":[["09:15","or","Chiranjit Das"],["11:00","mm2","Pinaz Tiwari"],["13:30","mac","Suresh KG"],["15:15","hrm","Prachi Thakur"]],"2026-12-09":[["09:15","wip","Urjani Chakravarty"],["15:15","fm","Shweta Bajpai"]],"2026-12-10":[["09:15","or","Chiranjit Das"],["11:00","ent","Deepika R Gupta"],["13:30","ma2","Somya Gupta"],["15:15","hrm","Prachi Thakur"]],"2026-12-11":[["09:15","hrm","Prachi Thakur"],["11:00","mac","Suresh KG"]],"2026-12-14":[["09:15","mac","Suresh KG"],["11:00","fm","Shweta Bajpai"],["13:30","mm2","Pinaz Tiwari"],["15:15","or","Chiranjit Das"],["17:00","ma2","Somya Gupta"]],"2026-12-15":[["11:00","ent","Deepika R Gupta"],["13:30","hrm","Prachi Thakur"]],"2026-12-16":[["09:15","fm","Shweta Bajpai"],["11:00","mm2","Pinaz Tiwari"],["13:30","hrm","Prachi Thakur"],["15:15","mac","Suresh KG"],["17:00","ma2","Somya Gupta"]],"2026-12-17":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-18":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-19":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-20":[["09:15","x:Assessments (quizzes, presentations)",""]],"2026-12-21":[["09:15","x:End-term exams",""]],"2026-12-22":[["09:15","x:End-term exams",""]],"2026-12-23":[["09:15","x:End-term exams",""]],"2026-12-24":[["09:15","x:End-term exams",""]]}}</script>
+<script id="state" type="application/json">{"v":4,"students":[{"id":"p1","name":"Prashant T","section":"C","av":0,"ts":1757400000000,"courses":{}}]}</script>
+<script id="app">
+(function(){
+/* ═══════════════════════════════════════════════════════════════════════
+   ONE SHARED BOARD FOR EVERYONE
+
+   Leave the quotes empty and the site still works completely — each person
+   just tracks themselves in their own browser. Nothing to set up.
+
+   Want one board the whole group edits? Paste a Firebase Realtime Database
+   URL between the quotes and re-upload this file. It looks like:
+
+       https://your-project-default-rtdb.firebaseio.com
+
+   Setup takes about five minutes and costs nothing. The steps are written
+   out in the Bunk Meter notes. Everyone must open the SAME uploaded file.
+   ═══════════════════════════════════════════════════════════════════════ */
+var SYNC_URL = "";
+
+var TN=4, TD=5; /* 80% */
+var COURSES=[
+ {id:"mm2",name:"Marketing Management II",      short:"Mktg II",cr:"3"},
+ {id:"mac",name:"Macroeconomics",               short:"Macro",  cr:"3"},
+ {id:"or", name:"Operations Research",          short:"OR",     cr:"3"},
+ {id:"fm", name:"Financial Management I",       short:"FM I",   cr:"2.25"},
+ {id:"ob2",name:"Organizational Behaviour II",  short:"OB II",  cr:"1.5"},
+ {id:"ma2",name:"Management Accounting II",     short:"MA II",  cr:"1.5"},
+ {id:"dt", name:"Design Thinking",              short:"DT",     cr:"1.5"},
+ {id:"ent",name:"Entrepreneurship",             short:"Entre",  cr:"1.5"},
+ {id:"hrm",name:"Human Resource Management",    short:"HRM",    cr:"1.5"},
+ {id:"wip",name:"Workshops on Interviews and Presentations", short:"WIP", cr:"1"}
+];
+var TERM="Term II";
+var CN={}; COURSES.forEach(function(c){ CN[c.id]=c; });
+function termTotals(sec){
+  var s=0,b=0; COURSES.forEach(function(c){ var n=plannedFor(sec,c.id); s+=n; b+=n-Math.ceil(n*TN/TD); });
+  return {s:s,b:b};
+}
+function andList(a){ return a.length<2?a.join(""):a.slice(0,-1).join(", ")+" and "+a[a.length-1]; }
+function sessionMix(sec){
+  var g={},ks=[];
+  COURSES.forEach(function(c){ var n=plannedFor(sec,c.id); if(!g[n]){ g[n]=[]; ks.push(n); } g[n].push(c.short); });
+  ks.sort(function(a,b){ return b-a; });
+  return ks.map(function(n){ return n+(g[n].length>1?" each":"")+" for "+andList(g[n]); }).join("; ");
+}
+var SECTIONS=["A","B","C","D"];
+var DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var AVCOL=["#FF2D78","#34D399","#FBBF24","#60A5FA","#C084FC","#FB7185","#2DD4BF","#F97316"];
+var AVATARS=[
+'<circle cx="50" cy="47" r="20"/><path d="M15 100c0-18 16-28 35-28s35 10 35 28Z"/><path d="M50 22c-13 0-22 9-22 21 0 3 1 6 2 8 1-8 4-12 8-14 4 2 8 3 12 3s8-1 12-3c4 2 7 6 8 14 1-2 2-5 2-8 0-12-9-21-22-21Z"/>',
+'<circle cx="50" cy="47" r="20"/><path d="M15 100c0-18 16-28 35-28s35 10 35 28Z"/><path d="M50 22c-13 0-22 9-22 21 0 3 1 6 2 8 1-8 4-12 8-14 4 2 8 3 12 3s8-1 12-3c4 2 7 6 8 14 1-2 2-5 2-8 0-12-9-21-22-21Z"/><path d="M30 48c0 16 9 25 20 25s20-9 20-25c0 9-9 13-20 13s-20-4-20-13Z"/>',
+'<circle cx="50" cy="49" r="20"/><path d="M15 100c0-18 16-28 35-28s35 10 35 28Z"/><path d="M50 20c-13 0-23 9-23 20h46c0-11-10-20-23-20Z"/><rect x="22" y="38" width="56" height="6" rx="3"/>',
+'<circle cx="50" cy="49" r="19"/><path d="M15 100c0-18 16-28 35-28s35 10 35 28Z"/><circle cx="34" cy="34" r="10"/><circle cx="50" cy="27" r="11"/><circle cx="66" cy="34" r="10"/><circle cx="28" cy="45" r="8"/><circle cx="72" cy="45" r="8"/>',
+'<circle cx="50" cy="47" r="19"/><path d="M17 100c0-17 15-27 33-27s33 10 33 27Z"/><path d="M50 21c-14 0-23 9-23 22v27c0 3 5 4 7 1 2-4 2-12 2-19 4 3 9 4 14 4s10-1 14-4c0 7 0 15 2 19 2 3 7 2 7-1V43c0-13-9-22-23-22Z"/>',
+'<circle cx="50" cy="49" r="19"/><path d="M15 100c0-18 16-28 35-28s35 10 35 28Z"/><circle cx="50" cy="16" r="9"/><path d="M50 24c-13 0-22 9-22 21 0 3 1 6 2 8 1-8 4-12 8-14 4 2 7 3 12 3s8-1 12-3c4 2 7 6 8 14 1-2 2-5 2-8 0-12-9-21-22-21Z"/>',
+'<circle cx="50" cy="47" r="19"/><path d="M15 100c0-18 16-28 35-28s35 10 35 28Z"/><path d="M50 21c-13 0-22 9-22 22 0 3 1 6 2 8 1-8 4-12 8-14 4 2 7 3 12 3s8-1 12-3c4 2 7 6 8 14 1-2 2-5 2-8 0-13-9-22-22-22Z"/><path d="M70 34c8 2 12 9 12 18s-4 15-10 18c-2 1-4-2-2-4 4-3 6-8 6-14s-3-11-8-13Z"/>',
+'<circle cx="50" cy="47" r="19"/><path d="M17 100c0-17 15-27 33-27s33 10 33 27Z"/><path d="M50 21c-13 0-22 9-22 22 0 3 1 6 2 8 1-8 4-12 8-14 4 2 7 3 12 3s8-1 12-3c4 2 7 6 8 14 1-2 2-5 2-8 0-13-9-22-22-22Z"/><circle cx="26" cy="52" r="6"/><circle cx="24" cy="65" r="5"/><circle cx="74" cy="52" r="6"/><circle cx="76" cy="65" r="5"/>'
+];
+
+
+var SCHED={}, state, sel=null, tab="me", fix={}, ART=null, saveState="idle", timer=null, muted=false, view="gate", curDate=null;
+var form=null; /* {mode:"add"|"edit", id, name, sec, av} */
+
+try{ SCHED=JSON.parse(document.getElementById("sched").textContent); }catch(e){ SCHED={}; }
+try{ state=JSON.parse(document.getElementById("state").textContent); }catch(e){ state={v:3,students:[]}; }
+if(!state.students||!state.students.length) state.students=[{id:"p1",name:"Prashant T",section:"C",courses:{}}];
+
+/* ---------- sound ---------- */
+var actx=null;
+function tone(f,dur,type,vol,to){
+  if(muted) return;
+  try{
+    if(!actx) actx=new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==="suspended") actx.resume();
+    var t=actx.currentTime,o=actx.createOscillator(),g=actx.createGain();
+    o.type=type||"sine"; o.frequency.setValueAtTime(f,t);
+    if(to) o.frequency.exponentialRampToValueAtTime(to,t+dur);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol||0.07,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+dur+0.03);
+  }catch(e){}
+}
+var SFX={
+  went:function(){tone(620,0.09,"sine",0.06,940);},
+  skip:function(){tone(320,0.13,"triangle",0.085,205);},
+  undo:function(){tone(540,0.08,"sine",0.05,340);},
+  tap:function(){tone(900,0.045,"sine",0.03);},
+  pick:function(){tone(430,0.09,"sine",0.055,760);setTimeout(function(){tone(860,0.13,"sine",0.045,1290);},80);},
+  danger:function(){tone(200,0.2,"sawtooth",0.055,150);}
+};
+
+/* ---------- schedule ---------- */
+function classDays(sec){ return Object.keys(SCHED[sec]||{}).sort(); }
+function onDay(sec,d){ return (SCHED[sec]||{})[d]||[]; }
+function plannedFor(sec,cid){ var n=0,S=SCHED[sec]||{},d,i; for(d in S){ for(i=0;i<S[d].length;i++) if(S[d][i][1]===cid) n++; } return n; }
+function datesFor(sec,cid){
+  var out=[],S=SCHED[sec]||{};
+  Object.keys(S).sort().forEach(function(d){ S[d].forEach(function(x){ if(x[1]===cid) out.push([d,x[0],x[2]]); }); });
+  return out;
+}
+function key(d,t){ return d+"|"+t; }
+function todayKey(){ var n=new Date(); return n.getFullYear()+"-"+("0"+(n.getMonth()+1)).slice(-2)+"-"+("0"+n.getDate()).slice(-2); }
+function nearestDay(sec){
+  var ds=classDays(sec), tk=todayKey(), i;
+  if(!ds.length) return null;
+  for(i=0;i<ds.length;i++) if(ds[i]===tk) return tk;
+  for(i=ds.length-1;i>=0;i--) if(ds[i]<tk) return ds[i];
+  return ds[0];
+}
+function fmtDay(d){
+  var p=d.split("-"), dt=new Date(+p[0],+p[1]-1,+p[2]);
+  return {day:DAYS[dt.getDay()], date:(+p[2])+" "+MON[+p[1]-1], iso:d, isToday:d===todayKey()};
+}
+function pendingCount(stu){
+  var n=0;
+  COURSES.forEach(function(c){ n+=calc(stu,c).unmarked; });
+  return n;
+}
+function oldestPending(stu){
+  var tk=todayKey(), S=SCHED[stu.section]||{}, ds=Object.keys(S).sort(), i,j;
+  for(i=0;i<ds.length;i++){
+    if(ds[i]>tk) break;
+    for(j=0;j<S[ds[i]].length;j++){
+      var x=S[ds[i]][j];
+      if(String(x[1]).indexOf("x:")===0) continue;
+      if(!cd(stu,CN[x[1]]).log[key(ds[i],x[0])]) return ds[i];
+    }
+  }
+  return null;
+}
+
+/* ---------- data ---------- */
+function cd(stu,c){
+  var d=stu.courses[c.id];
+  if(!d){ d=stu.courses[c.id]={log:{},miss:0}; }
+  if(!d.log) d.log={};
+  if(typeof d.miss!=="number") d.miss=0;
+  if(d.marks){ delete d.marks; } if(d.planned!==undefined){ delete d.planned; }
+  return d;
+}
+function calc(stu,c){
+  var sec=stu.section,d=cd(stu,c),dates=datesFor(sec,c.id);
+  var logP=0,logA=0,C=0,markedPast=0,i,tk=todayKey(),due=0;
+  for(i=0;i<dates.length;i++){
+    var past=dates[i][0]<=tk, m=d.log[key(dates[i][0],dates[i][1])];
+    if(past) due++;
+    if(m){
+      if(m==="P")logP++; else if(m==="A")logA++; else if(m==="C")C++;
+      if(past) markedPast++;
+    }
+  }
+  var miss=Math.max(0,d.miss||0);
+  var A=logA+miss;
+  /* past sessions you never marked and never counted are assumed attended */
+  var assumed=Math.max(0,due-markedPast-miss);
+  var P=logP+assumed;
+  var planned=dates.length, eff=Math.max(0,planned-C);
+  var req=eff>0?Math.ceil(eff*TN/TD):0, maxAbs=Math.max(0,eff-req), held=P+A;
+  var unmarked=Math.max(0,due-markedPast-miss);
+  return {planned:planned,P:P,A:A,C:C,logA:logA,logP:logP,eff:eff,req:req,maxAbs:maxAbs,
+          left:maxAbs-A,held:held,due:due,dates:dates,log:d.log,miss:miss,
+          markedPast:markedPast,unmarked:unmarked,
+          pct:held?Math.round(P/held*1000)/10:null};
+}
+function band(l){ return l<=0?"crit":(l===1?"warn":"safe"); }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+function initials(n){ var p=String(n).trim().split(/\s+/); return ((p[0]||"?")[0]+(p[1]?p[1][0]:"")).toUpperCase(); }
+function avcol(s){ return AVCOL[(typeof s==="object"?avIdx(s):hash(String(s)))%AVCOL.length]; }
+function hash(s){ var h=0,i; for(i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return h; }
+function avIdx(s){ return (typeof s.av==="number") ? (s.av%AVATARS.length) : (hash(s.id)%AVATARS.length); }
+function avSVG(i){ return '<svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">'+AVATARS[i%AVATARS.length]+'<\/svg>'; }
+function roster(){ return state.students.filter(function(s){ return !s.del; }); }
+function me(){ var r=roster(); return r.filter(function(s){return s.id===sel;})[0]||r[0]; }
+
+/* ---------- persistence: localStorage + optional shared sync ---------- */
+var LSKEY="bunkmeter.state.v4", syncURL=(SYNC_URL||"").trim(), pulling=false, lastPush=0;
+
+function saveLocal(){ try{ localStorage.setItem(LSKEY,JSON.stringify(state)); return true; }catch(e){ return false; } }
+function loadLocal(){ try{ var s=localStorage.getItem(LSKEY); if(s){ var o=JSON.parse(s); if(o&&o.students&&o.students.filter(function(x){return !x.del;}).length) return o; } }catch(e){} return null; }
+
+function setSave(s){
+  saveState=s; var el=document.getElementById("save"); if(!el) return;
+  el.setAttribute("data-s",s);
+  el.querySelector("span").textContent =
+    s==="saved"?(syncURL?"Synced with the group":"Saved"):
+    s==="saving"?"Saving":s==="off"?"Not saving":s==="offline"?"Saved locally, sync failed":
+    s==="pulling"?"Checking for updates":s==="error"?"Save failed":
+    (syncURL?"Shared board":"Saved in this browser");
+}
+function syncEndpoint(){
+  if(!syncURL) return "";
+  var u=syncURL.trim();
+  if(/firebaseio\.com|firebasedatabase\.app/.test(u) && u.indexOf(".json")<0)
+    u=u.replace(/\/+$/,"")+"/bunkmeter.json";
+  return u;
+}
+function pushRemote(){
+  var u=syncEndpoint(); if(!u) return;
+  lastPush=Date.now();
+  /* Read, merge, THEN write. Writing blind would wipe out whatever a friend
+     saved in the seconds since this phone last looked at the board. */
+  fetch(u,{cache:"no-store"})
+    .then(function(r){ return r.ok?r.json():null; },function(){ return null; })
+    .then(function(d){
+      if(mergeRemote(d)){ saveLocal(); render(); }
+      return fetch(u,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(state)});
+    })
+    .then(function(r){ lastPush=Date.now(); setSave(r&&r.ok?"saved":"offline"); })
+    .catch(function(){ setSave("offline"); });
+}
+function pullRemote(quiet){
+  var u=syncEndpoint(); if(!u||pulling) return;
+  pulling=true; if(!quiet) setSave("pulling");
+  fetch(u,{cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(d){
+    pulling=false;
+    if(mergeRemote(d)){ saveLocal(); render(); }
+    setSave("saved");
+  }).catch(function(){ pulling=false; setSave("offline"); });
+}
+function touch(stu){ if(stu) stu.ts=Date.now(); }
+function mergeRemote(remote){
+  if(!remote||!remote.students) return false;
+  var byId={},changed=false;
+  state.students.forEach(function(s){ byId[s.id]=s; });
+  remote.students.forEach(function(rs){
+    var ls=byId[rs.id];
+    if(!ls){ state.students.push(rs); changed=true; return; }
+    if((rs.ts||0)>(ls.ts||0)){
+      var idx=state.students.indexOf(ls);
+      state.students[idx]=rs; changed=true;
+    }
+  });
+  return changed;
+}
+function persist(){
+  saveLocal();
+  if(!syncURL){ setSave("saved"); return; }
+  if(timer) clearTimeout(timer);
+  setSave("saving");
+  timer=setTimeout(pushRemote,600);
+}
+setInterval(function(){
+  if(!syncURL||document.hidden||view!=="app") return;
+  if(Date.now()-lastPush<4000) return;
+  pullRemote(true);
+},15000);
+
+function exportJSON(){
+  var txt=JSON.stringify(state,null,2), done=false;
+  /* Downloading works on a normal web page. Some embedded viewers block it,
+     so fall back to the clipboard rather than looking broken. */
+  try{
+    var blob=new Blob([txt],{type:"application/json"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download="bunkmeter-backup.json";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ try{URL.revokeObjectURL(a.href);}catch(e){} a.remove(); },600);
+    done=true; toast("Saved bunkmeter-backup.json to your downloads");
+  }catch(e){}
+  if(!done){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ toast("Backup copied to your clipboard"); },
+                                             function(){ toast("Could not export here"); });
+    } else toast("Could not export here");
+  }
+}
+function importJSON(){
+  var inp=document.createElement("input"); inp.type="file"; inp.accept="application/json,.json";
+  inp.onchange=function(){
+    var f=inp.files&&inp.files[0]; if(!f) return;
+    var fr=new FileReader();
+    fr.onload=function(){
+      try{
+        var o=JSON.parse(fr.result);
+        if(!o||!o.students||!o.students.length) throw 0;
+        state=o; sel=null; view="gate"; saveLocal(); if(syncURL) pushRemote();
+        SFX.pick(); toast("Loaded "+o.students.length+" student"+(o.students.length===1?"":"s")); render();
+      }catch(e){ toast("That file isn't a Bunk Meter export"); }
+    };
+    fr.readAsText(f);
+  };
+  inp.click();
+}
+
+function toast(msg){
+  var t=document.getElementById("toast"); if(!t) return;
+  t.textContent=msg; t.classList.add("on");
+  clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove("on"); },1900);
+}
+
+/* ---------- gate ---------- */
+function formHTML(){
+  var isEdit=form.mode==="edit", i;
+  var h='<div class="gate"><div class="panel">'
+   +'<h2>'+(isEdit?"Edit profile":"Add someone")+'</h2>'
+   +'<div class="fld"><label for="f-name">Name</label>'
+   +'<input id="f-name" type="text" value="'+esc(form.name)+'" placeholder="e.g. Aditi Sharma" maxlength="40" autocomplete="off"></div>'
+   +'<div class="fld"><label>Section</label><div class="segs">';
+  SECTIONS.forEach(function(s){
+    h+='<button class="seg" data-fsec="'+s+'" aria-pressed="'+(form.sec===s)+'">'+s+'</button>';
+  });
+  h+='</div></div><div class="fld"><label>Pick an avatar</label><div class="avgrid">';
+  for(i=0;i<AVATARS.length;i++){
+    h+='<button class="avpick" data-fav="'+i+'" aria-pressed="'+(form.av===i)+'" '
+      +'style="background:'+AVCOL[i%AVCOL.length]+'" title="Avatar '+(i+1)+'">'+avSVG(i)+'</button>';
+  }
+  h+='</div></div><div class="prow">';
+  if(isEdit) h+='<button class="pb" data-fdel="1">Remove</button>';
+  h+='<button class="pb" data-fcancel="1">Cancel</button>'
+   +'<button class="pb go" data-fsave="1">'+(isEdit?"Save":"Add to the board")+'</button>'
+   +'</div></div></div>';
+  return h;
+}
+function gateHTML(){
+  if(form) return formHTML();
+  var h='<div class="gate"><div><div class="kick">Bunk Meter &middot; '+TERM+'</div>'
+       +'<h1 class="disp">Who&rsquo;s bunking?</h1></div><div class="profiles">';
+  roster().forEach(function(s){
+    var worst=99; COURSES.forEach(function(c){ var r=calc(s,c); if(r.left<worst) worst=r.left; });
+    h+='<button class="prof" data-enter="'+esc(s.id)+'">'
+      +'<span class="av" style="background:'+avcol(s)+'">'+avSVG(avIdx(s))+'</span>'
+      +'<span class="pn">'+esc(s.name)+'</span>'
+      +'<span class="ps">Sec '+esc(s.section)+' &middot; '+worst+' left</span></button>';
+  });
+  h+='<button class="prof" data-add="1"><span class="av new">+</span>'
+    +'<span class="pn">Add someone</span><span class="ps">A / B / C / D</span></button>';
+  h+='</div><div class="prow" style="justify-content:center">'
+    +'<button class="pb" data-editlist="1">Edit profiles</button>'
+    +'<button class="pb" data-export="1">Back up</button>'
+    +'<button class="pb" data-import="1">Restore</button></div>'
+    +'<p class="foot">Everyone logs into the same board. Pick your name and you only get asked about '
+    +'the classes your own section actually has that day.</p></div>';
+  return h;
+}
+
+/* ---------- day view ---------- */
+function dayHTML(stu){
+  var sec=stu.section, ds=classDays(sec);
+  if(!curDate||ds.indexOf(curDate)<0) curDate=nearestDay(sec);
+  var idx=ds.indexOf(curDate), f=fmtDay(curDate), items=onDay(sec,curDate);
+  var pend=pendingCount(stu);
+  var h='<div class="daynav">'
+    +'<button class="nb" data-day="prev" '+(idx<=0?"disabled":"")+' title="Previous class day">&#8249;</button>'
+    +'<button class="nb" data-day="next" '+(idx>=ds.length-1?"disabled":"")+' title="Next class day">&#8250;</button>'
+    +'<div><div class="dlab">'+(f.isToday?"Today &middot; ":"")+f.day+'</div>'
+    +'<div class="dsub">'+f.date+' &middot; Section '+esc(sec)+'</div></div>';
+  if(!f.isToday) h+='<button class="today-bt" data-day="today">Jump to today</button>';
+  else if(pend) h+='<button class="pending" data-day="pending">'+pend+' class'+(pend===1?"":"es")+' still unmarked &rsaquo;</button>';
+  h+='</div>';
+
+  if(!items.length){
+    h+='<div class="freeday"><b>Nothing scheduled</b>Enjoy it &mdash; no classes for Section '+esc(sec)+' on this day.</div>';
+    return h;
+  }
+  h+='<div class="slots">';
+  items.forEach(function(x){
+    var t=x[0], cid=x[1], prof=x[2];
+    if(String(cid).indexOf("x:")===0){
+      h+='<div class="slot evt"><div class="tm">'+t+'</div><div><div class="cn">'+esc(cid.slice(2))+'</div>'
+        +'<div class="pf">Not a graded session</div></div></div>';
+      return;
+    }
+    var c=CN[cid], d=cd(stu,c), st=d.log[key(curDate,t)]||"";
+    var lab = st==="P"?"Attended":st==="A"?"Bunked":st==="C"?"Cancelled":"";
+    h+='<div class="slot '+st+'"><div class="tm">'+t+'</div>'
+      +'<div><div class="cn">'+esc(c.name)+'</div>'
+      +'<div class="pf">'+(prof?esc(prof):"&mdash;")+'</div>'
+      +(lab?'<div class="st">'+lab+'</div>':'')+'</div>'
+      +'<div class="btns">'
+      +'<button class="sb y" data-mk="'+cid+'|'+t+'|P" aria-pressed="'+(st==="P")+'" title="Attended">&#10003;</button>'
+      +'<button class="sb n" data-mk="'+cid+'|'+t+'|A" aria-pressed="'+(st==="A")+'" title="Bunked">&#10007;</button>'
+      +'<button class="sb c" data-mk="'+cid+'|'+t+'|C" aria-pressed="'+(st==="C")+'" title="Class cancelled">&#8856;</button>'
+      +'</div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+
+
+/* ---------- catch up ---------- */
+function catchupHTML(stu){
+  var h='', tot=0;
+  COURSES.forEach(function(c){ tot+=calc(stu,c).miss; });
+  h+='<div class="banner'+(tot?" on":"")+'"><div class="bt2">'
+    +'<b>Haven&rsquo;t marked every day? Just say how many you&rsquo;ve missed.</b> '
+    +'Anything you never marked is counted as attended, so these numbers are the classes you bunked '
+    +'<i>without</i> logging them individually. Marking a day the normal way still works and adds on top &mdash; '
+    +'nothing here cancels that out.'
+    +'</div></div>';
+  h+='<div class="qgrid">';
+  COURSES.forEach(function(c){
+    var r=calc(stu,c), b=band(r.left);
+    h+='<div class="q '+b+'"><div class="qn"><div class="qt">'+esc(c.name)+'</div>'
+      +'<div class="qs">'+r.due+' held so far &middot; '+r.maxAbs+' allowed'
+      +(r.logA?' &middot; '+r.logA+' already marked':'')+'</div></div>'
+      +'<div class="step">'
+      +'<button data-miss="'+c.id+'|-1" '+(r.miss<=0?"disabled":"")+' aria-label="One fewer">&minus;</button>'
+      +'<span class="val">'+r.miss+'</span>'
+      +'<button data-miss="'+c.id+'|1" '+(r.miss>=r.unmarked+r.miss?"":"")+' aria-label="One more">+</button>'
+      +'</div>'
+      +'<div class="qleft"><b>'+r.left+'</b><span>left</span></div></div>';
+  });
+  h+='</div>';
+  h+='<p class="note">The middle number is <b>extra classes you missed but never logged</b>. '
+    +'The right-hand number is <b>how many you can still miss</b>. Classes held so far come from your section&rsquo;s '
+    +'timetable, so the percentages stay honest even if you never enter a single date. '
+    +'For a class that was <i>cancelled</i> rather than bunked, use day-by-day marking instead &mdash; a cancelled '
+    +'class leaves the denominator entirely, which changes your allowance.</p>';
+  return h;
+}
+
+/* ---------- app ---------- */
+function appHTML(){
+  var stu=me(),h='';
+  h+='<header class="bar"><div class="barin"><div class="logo">Bunk<b>Meter</b></div><div class="sp"></div>'
+    +'<div class="save" id="save" data-s="idle"><i class="dot"></i><span>Ready</span></div>'
+    +'<button class="icon" data-mute="1" aria-pressed="'+muted+'" title="'+(muted?"Sound off":"Sound on")+'">'
+    +(muted?"&#9788;":"&#9834;")+'</button>'
+    +'<button class="whoami" data-switch="1" title="Switch student">'
+    +'<span class="mini" style="background:'+avcol(stu)+'">'+avSVG(avIdx(stu))+'</span>'
+    +'<span class="t">'+esc(stu.name)+'</span></button></div></header><div class="wrap">';
+
+  var totLeft=0,risk=0,allP=0,allHeld=0,worst=99,worstC=null,allUn=0,allMk=0,over=0;
+  COURSES.forEach(function(c){
+    var r=calc(stu,c);
+    totLeft+=Math.max(0,r.left); if(r.left<=1) risk++;
+    if(r.left<0) over+=Math.abs(r.left);
+    allP+=r.P; allHeld+=r.held; allUn+=r.unmarked; allMk+=r.markedPast+r.miss;
+    if(r.left<worst){ worst=r.left; worstC=c; }
+  });
+  var pct=allHeld?Math.round(allP/allHeld*1000)/10:null;
+
+  h+='<section class="hero stagger"><div class="lab">'+esc(stu.name)+' &middot; Section '+esc(stu.section)+' &middot; '+TERM+'</div>'
+    +'<div class="big disp num">'+totLeft+' <span>'+(totLeft===1?"class":"classes")+' left to skip</span></div>'
+    +'<p class="sub">Out of <b>'+termTotals(stu.section).b+'</b> at the start of '+TERM+', across '+termTotals(stu.section).s+' sessions on your section&rsquo;s timetable. '
+    +(allUn>0
+        ? '<b>'+allUn+'</b> class'+(allUn===1?'':'es')+' since term start '+(allUn===1?'is':'are')
+          +' still unmarked, and anything unmarked counts as attended. Open <b>Catch up</b> and it takes about a minute.'
+        : (allMk===0 ? 'Nothing logged yet &mdash; start with the day below.'
+                     : 'Everything up to today is marked. You&rsquo;re at <b>'+pct+'%</b>, '+allP+' of '+allHeld+' attended.'))
+    +'</p>'
+    +(over>0?'<div class="tight crit">&#9679; You are <b>'+over+'</b> session'+(over===1?'':'s')+' past the limit &mdash; that does not undo itself</div>':'')
+    +(worstC?'<div class="tight '+band(worst)+'">&#9679; Tightest: <b>'+esc(worstC.name)+'</b> &mdash; '
+      +(worst<0?Math.abs(worst)+' over the limit':worst===0?'no bunks left':worst+' left')+'</div>':'')
+    +'</section>';
+
+  h+='<div class="tabs" role="tablist">'
+    +'<button class="tab" role="tab" aria-selected="'+(tab==="me")+'" data-tab="me">My day</button>'
+    +'<button class="tab" role="tab" aria-selected="'+(tab==="quick")+'" data-tab="quick">Catch up</button>'
+    +'<button class="tab" role="tab" aria-selected="'+(tab==="courses")+'" data-tab="courses">Courses</button>'
+    +'<button class="tab" role="tab" aria-selected="'+(tab==="group")+'" data-tab="group">The group</button></div>';
+
+  if(tab==="me"){
+    h+='<div class="rowhead"><h2>Your classes</h2><span class="hint">Straight from Section '+esc(stu.section)+'&rsquo;s timetable</span></div>';
+    h+=dayHTML(stu);
+  } else if(tab==="quick"){
+    h+='<div class="rowhead"><h2>Catch up</h2><span class="hint">For everything you never marked</span></div>';
+    h+=catchupHTML(stu);
+  } else if(tab==="courses"){
+    h+='<div class="rowhead"><h2>Course by course</h2><span class="hint">Session counts come from the timetable</span></div>';
+    h+='<div class="cards">';
+    COURSES.forEach(function(c,ci){
+      var r=calc(stu,c),b=band(r.left),i;
+      h+='<article class="card '+b+' stagger" style="animation-delay:'+(ci*35)+'ms"><div class="chead"><div>'
+        +'<div class="cname">'+esc(c.name)+'</div>'
+        +'<div class="cmeta">'+c.cr+(c.cr==="1"?" credit":" credits")+' &middot; '+r.planned+' sessions &middot; '
+        +(r.pct===null?'nothing logged':r.pct+'% &middot; '+r.P+'/'+r.held)
+        +' &middot; need '+r.req+' of '+r.eff+'</div></div>'
+        +'<div class="bunks"><b>'+r.left+'</b><span>'
+        +(r.left<0?"over limit":r.left===1?"bunk left":"bunks left")+'</span></div></div>';
+      h+='<div class="meter">';
+      if(r.maxAbs===0) h+='<i class="blk used"></i>';
+      for(i=0;i<r.maxAbs;i++) h+='<i class="blk '+(i<r.A?"used":"free")+'"></i>';
+      h+='</div><div class="mlab"><span>'+r.A+' of '+r.maxAbs+' allowed absences used</span>'
+        +(r.left<0?'<b>'+Math.abs(r.left)+' over</b>':'<span>'+r.unmarked+' unmarked so far</span>')+'</div>';
+      h+='<div class="fix"><button class="fixh" data-fix="'+c.id+'">'
+        +(fix[c.id]?"&#9662; Hide":"&#9656; Every session")+' &middot; '+(r.markedPast+r.miss)+' of '+r.planned+' marked</button>';
+      if(fix[c.id]){
+        h+='<div class="strip">';
+        r.dates.forEach(function(x,i2){
+          var m=r.log[key(x[0],x[1])]||"", fd=fmtDay(x[0]);
+          h+='<button class="cell '+m+'" data-c="'+c.id+'" data-k="'+x[0]+'|'+x[1]+'" title="'
+            +fd.day+' '+fd.date+' at '+x[1]+(x[2]?" &middot; "+esc(x[2]):"")+'">'+(i2+1)+'</button>';
+        });
+        h+='</div><div class="plan">Tap to cycle: blank &rarr; attended &rarr; bunked &rarr; cancelled. Hover to see the date.</div>';
+      }
+      h+='</div></article>';
+    });
+    h+='</div>';
+    var tt=termTotals(stu.section);
+    h+='<p class="note">Session counts are read from Section '+esc(stu.section)+'&rsquo;s '+TERM+' timetable, not typed in &mdash; '
+      +sessionMix(stu.section)+'. '
+      +tt.s+' sessions, '+tt.b+' bunks, and they don&rsquo;t pool. A cancelled class leaves the denominator, so your '
+      +'allowance recalculates on its own, and the requirement always rounds up.</p>';
+  } else {
+    h+='<div class="rowhead"><h2>The whole group</h2><span class="hint">Bunks remaining, per course</span></div>';
+    h+='<div class="tblwrap"><table><thead><tr><th style="text-align:left">Student</th>';
+    COURSES.forEach(function(c){ h+='<th>'+esc(c.short)+'</th>'; });
+    h+='<th>Tightest</th></tr></thead><tbody>';
+    roster().slice().sort(function(a,b){
+      return a.section!==b.section?(a.section<b.section?-1:1):(a.name<b.name?-1:1);
+    }).forEach(function(s){
+      var w=99;
+      h+='<tr><td class="who"><span class="mini" style="background:'+avcol(s)+'">'+avSVG(avIdx(s))+'</span>'
+        +'<span>'+esc(s.name)+'<small>Sec '+esc(s.section)+'</small></span></td>';
+      COURSES.forEach(function(c){ var r=calc(s,c); if(r.left<w) w=r.left;
+        h+='<td><span class="pill '+band(r.left)+'">'+r.left+'</span></td>'; });
+      h+='<td><span class="pill '+band(w)+'">'+w+'</span></td></tr>';
+    });
+    h+='</tbody></table></div>';
+    h+='<p class="note">Bunks remaining before that course drops below 80%. Red means the allowance is gone. '
+      +'Sections A to D run different '+TERM+' timetables: '
+      +SECTIONS.map(function(x){ var q=termTotals(x); return x+' has '+q.s+' sessions and '+q.b+' bunks'; }).join(", ")+'.</p>';
+  }
+  h+='</div>';
+  return h;
+}
+
+var rendering=false;
+function render(){ if(rendering) return; rendering=true; try{ paint(); } finally{ rendering=false; } }
+function paint(){
+  var root=document.getElementById("root"), act=document.activeElement;
+  var fid=(act&&act.id&&root.contains(act))?act.id:null;
+  if(fid){ try{ act.blur(); }catch(e){} }
+  root.innerHTML=(view==="app"&&!form)?appHTML():gateHTML();
+  if(fid){ var b=document.getElementById(fid); if(b) b.focus(); }
+  if(view==="app") setSave(saveState);
+}
+
+var _lastK="",_lastT=0;
+/* Blocks ONE physical tap being delivered twice. A duplicated event always
+   lands within a few milliseconds; a human repeat-tap is never under ~100ms.
+   So 90ms kills the ghost without ever swallowing a tap the user meant.
+   "Add to the board" is the exception: nobody taps that twice on purpose. */
+function dupe(k,w){ var n=Date.now(); if(k===_lastK && n-_lastT<(w||90)) return true; _lastK=k; _lastT=n; return false; }
+function syncFormName(){ var el=document.getElementById("f-name"); if(el&&form) form.name=el.value; }
+
+/* ---------- events ---------- */
+document.addEventListener("click",function(ev){
+  var t=ev.target.closest?ev.target.closest("[data-enter],[data-add],[data-tab],[data-switch],[data-mute],[data-day],[data-mk],[data-fix],[data-c],[data-editlist],[data-fsec],[data-fav],[data-fcancel],[data-fsave],[data-fdel],[data-export],[data-import],[data-miss]"):null;
+  if(!t) return;
+
+  if(t.hasAttribute("data-enter")){
+    var pid=t.getAttribute("data-enter");
+    if(ev.shiftKey||ev.altKey){ var ps=roster().filter(function(s){return s.id===pid;})[0];
+      if(ps){ form={mode:"edit",id:ps.id,name:ps.name,sec:ps.section,av:avIdx(ps)}; SFX.tap(); render(); return; } }
+    sel=pid; view="app"; curDate=nearestDay(me().section); SFX.pick(); render(); return; }
+  if(t.hasAttribute("data-add")){ form={mode:"add",name:"",sec:"C",av:Math.floor(Math.random()*AVATARS.length)}; SFX.tap(); render(); return; }
+  if(t.hasAttribute("data-editlist")){
+    if(!roster().length) return;
+    var s0=roster()[0];
+    form={mode:"edit",id:s0.id,name:s0.name,sec:s0.section,av:avIdx(s0)}; SFX.tap(); render(); return;
+  }
+  if(t.hasAttribute("data-fsec")){ form.sec=t.getAttribute("data-fsec"); syncFormName(); SFX.tap(); render(); return; }
+  if(t.hasAttribute("data-fav")){ form.av=parseInt(t.getAttribute("data-fav"),10); syncFormName(); SFX.tap(); render(); return; }
+  if(t.hasAttribute("data-fcancel")){ form=null; view=sel?"app":"gate"; SFX.tap(); render(); return; }
+  if(t.hasAttribute("data-export")){ exportJSON(); return; }
+  if(t.hasAttribute("data-import")){ importJSON(); return; }
+  if(t.hasAttribute("data-fdel")){
+    if(roster().length<2){ toast("You can't remove the last profile"); return; }
+    state.students.forEach(function(s){ if(s.id===form.id){ s.del=1; touch(s); } });
+    if(sel===form.id) sel=null;
+    form=null; SFX.undo(); toast("Removed"); render(); persist(); return;
+  }
+  if(t.hasAttribute("data-fsave")){
+    if(dupe("save",600)) return;
+    syncFormName();
+    var nm=(form.name||"").trim().slice(0,40);
+    if(!nm){ toast("Give them a name first"); var fn=document.getElementById("f-name"); if(fn) fn.focus(); return; }
+    var clash=roster().filter(function(s){
+      return s.id!==form.id && s.section===form.sec &&
+             s.name.trim().toLowerCase()===nm.toLowerCase(); }).length>0;
+    if(clash){ toast(nm+" is already on the board in Section "+form.sec); return; }
+    if(form.mode==="edit"){
+      state.students.forEach(function(s){ if(s.id===form.id){ s.name=nm; s.section=form.sec; s.av=form.av; s.del=0; touch(s); } });
+      toast("Saved");
+    } else {
+      var id="s"+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36);
+      state.students.push({id:id,name:nm,section:form.sec,av:form.av,ts:Date.now(),courses:{}});
+      sel=id; view="app"; curDate=nearestDay(form.sec);
+      toast(nm+" added to Section "+form.sec);
+    }
+    form=null; SFX.pick(); render(); persist(); return;
+  }
+  if(t.hasAttribute("data-switch")){ view="gate"; SFX.tap(); render(); return; }
+  if(t.hasAttribute("data-mute")){ muted=!muted; if(!muted) SFX.tap(); render(); return; }
+  if(t.hasAttribute("data-tab")){ tab=t.getAttribute("data-tab"); SFX.tap(); render(); return; }
+
+  if(t.hasAttribute("data-day")){
+    var stu=me(), ds=classDays(stu.section), a=t.getAttribute("data-day"), i=ds.indexOf(curDate);
+    if(a==="prev"&&i>0) curDate=ds[i-1];
+    else if(a==="next"&&i<ds.length-1) curDate=ds[i+1];
+    else if(a==="today") curDate=nearestDay(stu.section);
+    else if(a==="pending"){ var op=oldestPending(stu); if(op) curDate=op; else toast("Everything up to today is marked"); }
+    SFX.tap(); render(); return;
+  }
+
+  if(t.hasAttribute("data-mk")){
+    if(dupe("mk"+t.getAttribute("data-mk")+curDate)) return;
+    var p=t.getAttribute("data-mk").split("|"), cid=p[0], tm=p[1], mk=p[2];
+    var stu2=me(), c=CN[cid], d=cd(stu2,c), k=key(curDate,tm);
+    touch(stu2);
+    if(d.log[k]===mk){ delete d.log[k]; SFX.undo(); toast("Cleared "+c.short); }
+    else{
+      d.log[k]=mk;
+      var r=calc(stu2,c);
+      if(mk==="A"){
+        if(r.left<0){ SFX.danger(); toast(c.short+": "+Math.abs(r.left)+" over the limit"); }
+        else if(r.left===0){ SFX.danger(); toast(c.short+": that was your last one"); }
+        else { SFX.skip(); toast(c.short+": "+r.left+" bunk"+(r.left===1?"":"s")+" left"); }
+      } else if(mk==="C"){ SFX.tap(); toast(c.short+" cancelled &mdash; "+r.left+" bunks left"); }
+      else { SFX.went(); toast(c.short+": attended, "+r.left+" left"); }
+    }
+    render(); persist(); return;
+  }
+
+  if(t.hasAttribute("data-miss")){
+    if(dupe("ms"+t.getAttribute("data-miss"))) return;
+    var pm=t.getAttribute("data-miss").split("|"), stuQ=me(), cq=CN[pm[0]], dq=cd(stuQ,cq);
+    var rq=calc(stuQ,cq), delta=parseInt(pm[1],10), cap=rq.miss+rq.unmarked;
+    var nv=dq.miss+delta;
+    if(nv<0) nv=0; if(nv>cap) nv=cap;
+    if(nv===dq.miss){ toast(delta>0?cq.short+": nothing left unmarked to count":"Already at zero"); return; }
+    dq.miss=nv; touch(stuQ);
+    var r2=calc(stuQ,cq);
+    if(delta>0){
+      if(r2.left<0){ SFX.danger(); toast(cq.short+": "+Math.abs(r2.left)+" over the limit"); }
+      else if(r2.left===0){ SFX.danger(); toast(cq.short+": no bunks left"); }
+      else { SFX.skip(); toast(cq.short+": "+r2.left+" left"); }
+    } else { SFX.undo(); toast(cq.short+": "+r2.left+" left"); }
+    render(); persist(); return;
+  }
+  if(t.hasAttribute("data-fix")){ var fk=t.getAttribute("data-fix"); fix[fk]=!fix[fk]; SFX.tap(); render(); return; }
+
+  if(t.hasAttribute("data-c")){
+    if(dupe("c"+t.getAttribute("data-c")+t.getAttribute("data-k"))) return;
+    var stu3=me(), c3=CN[t.getAttribute("data-c")], d3=cd(stu3,c3), kk=t.getAttribute("data-k");
+    var ORD=["P","A","C"], cur=d3.log[kk]||"";
+    var nx=cur===""?"P":(ORD.indexOf(cur)===ORD.length-1?"":ORD[ORD.indexOf(cur)+1]);
+    if(nx==="") delete d3.log[kk]; else d3.log[kk]=nx;
+    touch(stu3);
+    SFX.tap(); render(); persist();
+  }
+});
+
+var _ls=loadLocal(); if(_ls) state=_ls;
+render();
+if(syncURL) pullRemote();
+})();
+
+</script>
+
+</body>
+</html>
